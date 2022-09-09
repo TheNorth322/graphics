@@ -1,10 +1,14 @@
+//#include <windows.h>
 #include "point.h"
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
 #include <iostream>
 #include <vector>
-#define ITERATIONS_COUNT 10;
+
+#define ITERATIONS_COUNT 10
+#define WINDOW_WIDTH 800
+#define WINDOW_HEIGHT 800
 
 void resize(int width, int height) {}
 
@@ -25,6 +29,15 @@ void drawTriangle(std::vector<Point> points) {
 
   glEnd();
 }
+void drawString(std::string str, double posX, double posY) {
+  int i = 0;
+  while (str[i] != '\0') {
+    glRasterPos2d(posX, posY);
+    glutBitmapCharacter(GLUT_BITMAP_8_BY_13, str[i]);
+    posX += 0.12;
+    i++;
+  }
+}
 
 // Отрисовка треугольника Серпинского рекурсивным способом
 void drawSerpinsky(std::vector<Point> points, int iterationsCount) {
@@ -41,14 +54,14 @@ void drawSerpinsky(std::vector<Point> points, int iterationsCount) {
   middles.push_back(getMiddle(points[0], points[2]));
   drawSerpinsky(middles, iterationsCount - 1);
   middles.clear();
-  
+
   // Верхний треугольник
   middles.push_back(points[1]);
   middles.push_back(getMiddle(points[0], points[1]));
   middles.push_back(getMiddle(points[1], points[2]));
   drawSerpinsky(middles, iterationsCount - 1);
   middles.clear();
-  
+
   // Правый треугольник
   middles.push_back(points[2]);
   middles.push_back(getMiddle(points[2], points[1]));
@@ -59,23 +72,13 @@ void drawSerpinsky(std::vector<Point> points, int iterationsCount) {
 
 void display(void) {
   std::string title = "Gorshkov Osokin Kashaev ABT-113\0";
-  double titleX = -2;
-  int i = 0, iterationsCount = 10;
-  
+
   std::vector<Point> startPoints = {Point(-5.0, -5.0), Point(0.0, 5.0),
                                     Point(5.0, -5.0)};
   // Отображение треугольника Серпинского
   drawTriangle(startPoints);
-  drawSerpinsky(startPoints, iterationsCount);
-  
-  // Отображение текста
-  while (title[i] != '\0') {
-    glRasterPos2d(titleX, 6);
-    glutBitmapCharacter(GLUT_BITMAP_8_BY_13, title[i]);
-    titleX += 0.12;
-    i++;
-  }
-
+  drawSerpinsky(startPoints, ITERATIONS_COUNT);
+  drawString(title, -2, 6);
   glutSwapBuffers();
 }
 
@@ -97,7 +100,7 @@ int main(int argc, char **argv) {
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
   glutInitWindowPosition(50, 10);
-  glutInitWindowSize(800, 800);
+  glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
   glutCreateWindow("Serpinsky");
   glutReshapeFunc(resize);
   init();
